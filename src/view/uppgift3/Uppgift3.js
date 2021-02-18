@@ -1,18 +1,31 @@
-import React from 'react'
+import {React, useState, useEffect } from 'react'
 import StarwarsService from '../../shared/api/service/StarwarsService'
 
 export const Uppgift3 = () => {
-	const character = undefined
-	const count = 1
+	const [character, setCharacter] = useState([]);
+	const [count, setCount] = useState(1);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		getCharacterNameFromStarwarsAPI();
+	}, [count])
 
 	const getCharacterNameFromStarwarsAPI = async () => {
-		const { data } = await StarwarsService.getStarwarsCharacter(count)
+		try {
+			setIsLoading(true);
+
+			const { data: characterData } = await StarwarsService.getStarwarsCharacter(count);
+			setCharacter(characterData);
+			setIsLoading(false);
+		} catch (e){
+			alert("Fel vid anrop");
+		}
 	}
 
 	const buttons = () => {
 		return <div>
-			<button>Increment</button> <br />
-			<button>Decrement</button>
+			<button onClick={() => setCount(count+1)}>Increment</button> <br />
+			<button onClick={() => setCount(Number(count > 0) && count - 1)}>Decrement</button> {/* olfdolf kod, bad practice */}
 		</div>
 	}
 
@@ -27,6 +40,8 @@ export const Uppgift3 = () => {
 	return (
 		<div>
 			<h1>Uppgift 3</h1>
+	
+			{isLoading ? 'Laddar karaktär...': ''}
 			{displayCharacterName()}
 			{buttons()}
 		</div>
